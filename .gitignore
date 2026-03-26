@@ -1,4 +1,7 @@
 node_modules/
-
-# Environment variables
 .env
+dist/
+build/
+*.log
+.DS_Store
+coverage/
