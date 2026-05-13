@@ -13,16 +13,18 @@ CREATE TABLE IF NOT EXISTS users (
   id           CHAR(36)     NOT NULL DEFAULT (UUID()),
   name         VARCHAR(100) NOT NULL,
   email        VARCHAR(150) NOT NULL,
-  password_hash TEXT        NOT NULL,
+  password_hash TEXT        NULL,
   role         ENUM('student','technician','admin') NOT NULL DEFAULT 'student',
   is_verified  TINYINT(1)   NOT NULL DEFAULT 0,
   department   VARCHAR(100),
   phone        VARCHAR(20),
   avatar_url   TEXT,
+  google_uid   VARCHAR(128) NULL,
   created_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   UNIQUE KEY idx_email (email),
+  UNIQUE KEY idx_google_uid (google_uid),
   KEY idx_role (role)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -75,6 +77,8 @@ CREATE TABLE IF NOT EXISTS tickets (
   priority     ENUM('low','medium','high','critical') NOT NULL DEFAULT 'medium',
   submitter_id CHAR(36)     NOT NULL,
   assigned_to  CHAR(36)     DEFAULT NULL,
+  photo_url    VARCHAR(255) DEFAULT NULL,
+  is_anonymous TINYINT(1)   NOT NULL DEFAULT 0,
   created_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),

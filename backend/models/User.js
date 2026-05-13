@@ -21,7 +21,7 @@ const User = sequelize.define('User', {
   },
   password_hash: {
     type: DataTypes.TEXT,
-    allowNull: false,
+    allowNull: true,
   },
   role: {
     type: DataTypes.ENUM('student', 'technician', 'admin'),
@@ -34,6 +34,15 @@ const User = sequelize.define('User', {
   department: DataTypes.STRING(100),
   phone: DataTypes.STRING(20),
   avatar_url: DataTypes.TEXT,
+  google_uid: {
+    type: DataTypes.STRING(128),
+    allowNull: true,
+    unique: true,
+  },
+  status: {
+    type: DataTypes.ENUM('active', 'inactive'),
+    defaultValue: 'active',
+  },
 }, {
   tableName: 'users',
   underscored: true,
@@ -47,6 +56,7 @@ const User = sequelize.define('User', {
 });
 
 User.prototype.comparePassword = async function (plain) {
+  if (!this.password_hash) return false;
   return bcrypt.compare(plain, this.password_hash);
 };
 
