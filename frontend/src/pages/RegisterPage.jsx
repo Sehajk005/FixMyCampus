@@ -1,89 +1,161 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import OtpVerification from '../components/OtpVerification';
 import { useAuth } from '../context/AuthContext';
-import { connectSocket } from '../services/socket';
+import { signInWithGoogle } from '../services/googleAuth';
 
 export default function RegisterPage() {
+  const [step, setStep] = useState(1);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [step, setStep] = useState(1);
-  const [form, setForm] = useState({ name:'', email:'', password:'', otp:'' });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
 
-  async function handleSendOtp() {
-    setLoading(true); setError('');
-    try { await api.post('/auth/send-otp', { email: form.email }); setSuccess(`OTP sent to ${form.email}`); setStep(2); }
-    catch (err) { setError(err.response?.data?.error || 'Failed to send OTP'); }
-    finally { setLoading(false); }
-  }
-
-  async function handleRegister() {
-    setLoading(true); setError('');
+  const handleGoogleRegister = async () => {
+    setLoading(true);
+    setError('');
     try {
-      const res = await api.post('/auth/register', form);
-      const { user, accessToken, refreshToken } = res.data;
-      login(user, accessToken, refreshToken); connectSocket(accessToken); navigate('/dashboard');
-    } catch (err) { setError(err.response?.data?.error || 'Registration failed'); }
-    finally { setLoading(false); }
-  }
+      const data = await signInWithGoogle();
+      login(data.user, data.accessToken);
+      navigate('/dashboard');
+    } catch (err) {
+      if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
+        // User dismissed — show nothing
+      } else if (err.code === 'auth/popup-blocked') {
+        setError('Please allow popups for this site to use Google sign-in.');
+      } else {
+        setError(err.response?.data?.error || 'Google sign-in failed. Please try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters long.');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      await api.post('/auth/register', { name, email, password });
+      setStep(2); // Proceed to OTP view
+    } catch (err) {
+      setError(err.response?.data?.error || 'Registration failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', position: 'relative' }}>
-      <div style={{ position: 'fixed', top: '10%', right: '5%', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
-
-      <div className="animate-fade-up" style={{ width: '100%', maxWidth: 420 }}>
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <div style={{ width: 64, height: 64, borderRadius: 18, background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, margin: '0 auto 1rem', boxShadow: '0 0 30px rgba(99,102,241,0.4)' }}>🏫</div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#f1f5f9', letterSpacing: '-0.02em' }}>Create Account</h1>
-          <p style={{ color: '#64748b', fontSize: '0.875rem', marginTop: '0.25rem' }}>Join Fix My Campus</p>
-        </div>
-
-        {/* Progress */}
-        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
-          {['Verify Email', 'Set Password'].map((label, i) => (
-            <div key={label} style={{ flex: 1, height: 4, borderRadius: 99, background: step > i ? 'linear-gradient(90deg, #6366f1, #8b5cf6)' : 'rgba(255,255,255,0.08)', transition: 'background 0.4s' }} />
-          ))}
-        </div>
-
-        <div style={{ background: 'rgba(15,22,41,0.85)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '1.25rem', padding: '2rem' }}>
-          {error && <div className="alert-error animate-fade-in" style={{ marginBottom: '1rem' }}>⚠ {error}</div>}
-          {success && <div className="alert-success animate-fade-in" style={{ marginBottom: '1rem' }}>✓ {success}</div>}
-
-          {step === 1 ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div><label className="label">University Email</label>
-                <input name="email" type="email" className="input-field" placeholder="yourname@chitkara.edu" value={form.email} onChange={e => setForm(f=>({...f,email:e.target.value}))} autoFocus />
-              </div>
-              <button onClick={handleSendOtp} disabled={!form.email || loading} className="btn-primary" style={{ width: '100%', padding: '0.75rem' }}>
-                {loading ? <span className="dot-loader"><span/><span/><span/></span> : 'Send OTP →'}
-              </button>
+    <div className="auth-screen">
+      <div className="auth-card motion-auth-panel motion-chart-panel">
+        
+        {step === 1 ? (
+          <div className="animate-fade-up">
+            <div className="text-center mb-8">
+              <h1 className="text-3xl font-extrabold" style={{ color: 'var(--text-strong)' }}>Join FixMyCampus</h1>
+              <p className="mt-2 text-sm" style={{ color: 'var(--text-muted)' }}>Report and track campus issues with ease.</p>
             </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div><label className="label">Your Name</label>
-                <input type="text" className="input-field" placeholder="Full name" value={form.name} onChange={e => setForm(f=>({...f,name:e.target.value}))} autoFocus />
-              </div>
-              <div><label className="label">OTP Code</label>
-                <input type="text" maxLength={6} className="input-field" placeholder="6-digit code" value={form.otp} onChange={e => setForm(f=>({...f,otp:e.target.value}))} style={{ textAlign: 'center', letterSpacing: '0.3em', fontSize: '1.25rem', fontFamily: 'JetBrains Mono, monospace' }} />
-              </div>
-              <div><label className="label">Password</label>
-                <input type="password" className="input-field" placeholder="Min 8 characters" value={form.password} onChange={e => setForm(f=>({...f,password:e.target.value}))} />
-              </div>
-              <button onClick={handleRegister} disabled={!form.name || !form.otp || !form.password || loading} className="btn-primary" style={{ width: '100%', padding: '0.75rem' }}>
-                {loading ? <span className="dot-loader"><span/><span/><span/></span> : '🎉 Create Account'}
-              </button>
-              <button onClick={() => { setStep(1); setError(''); setSuccess(''); }} className="btn-secondary" style={{ width: '100%' }}>← Change email</button>
-            </div>
-          )}
 
-          <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.85rem', color: '#64748b' }}>
-            Already have an account?{' '}
-            <Link to="/login" style={{ color: '#818cf8', textDecoration: 'none', fontWeight: 600 }}>Sign in</Link>
-          </p>
-        </div>
+            {error && (
+              <div className="p-3 rounded-xl mb-6 text-sm flex items-center motion-error-banner" style={{ background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.32)', color: '#fca5a5' }}>
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleRegister} className="space-y-5">
+              <div>
+                <label className="label">Full Name</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="input-field"
+                  placeholder="Jane Doe"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="label">Campus Email</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="input-field"
+                  placeholder="you@campus.edu"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="label">Password</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="input-field"
+                  placeholder="Minimum 8 characters"
+                  required
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="btn-primary w-full mt-4"
+              >
+                {loading ? 'Setting up account...' : 'Create Account'}
+              </button>
+            </form>
+
+            <div className="flex items-center gap-3 mt-6 mb-4">
+              <div className="flex-1 h-px" style={{ background: 'var(--border)' }} />
+              <span className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>or</span>
+              <div className="flex-1 h-px" style={{ background: 'var(--border)' }} />
+            </div>
+
+            <button
+              type="button"
+              onClick={handleGoogleRegister}
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl font-semibold text-sm transition-all hover:opacity-90 disabled:opacity-50"
+              style={{ background: '#ffffff', color: '#1f1f1f', border: '1px solid var(--border)' }}
+            >
+              <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
+                <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/>
+                <path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/>
+                <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
+              </svg>
+              Continue with Google
+            </button>
+
+            <div className="mt-6 text-center">
+              <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                Already have an account?{' '}
+                <Link to="/login" className="text-link">
+                  Log in here
+                </Link>
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="animate-slide-right flex items-center justify-center h-full">
+            <OtpVerification email={email} />
+          </div>
+        )}
       </div>
     </div>
   );
