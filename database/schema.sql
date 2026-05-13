@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS users (
   phone        VARCHAR(20),
   avatar_url   TEXT,
   google_uid   VARCHAR(128) NULL,
+  status       ENUM('active','inactive') NOT NULL DEFAULT 'active',
   created_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
