@@ -3,6 +3,11 @@
  * Tests: auth flow + ticket round-trip with JWT
  */
 
+jest.mock('../config/firebase', () => ({
+  admin: { auth: () => ({ verifyIdToken: jest.fn() }) },
+  db: {},
+}));
+
 const request = require('supertest');
 const app = require('../app');
 const { sequelize } = require('../config/database');

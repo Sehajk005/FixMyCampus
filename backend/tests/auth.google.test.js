@@ -1,8 +1,12 @@
-jest.mock('../config/firebase', () => ({
-  admin: {
-    auth: () => ({ verifyIdToken: jest.fn() }),
-  },
-}));
+jest.mock('../config/firebase', () => {
+  const mockVerifyIdToken = jest.fn();
+  const authInstance = { verifyIdToken: mockVerifyIdToken };
+  return {
+    admin: {
+      auth: () => authInstance,
+    },
+  };
+});
 
 const request = require('supertest');
 const { admin } = require('../config/firebase');

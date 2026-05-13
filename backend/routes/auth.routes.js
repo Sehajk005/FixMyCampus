@@ -1,14 +1,28 @@
 const { Router } = require('express');
 const { body } = require('express-validator');
-const { sendOtp, register, login, refreshToken, getMe, getTechnicians, updateProfile, changePassword } = require('../controllers/auth.controller');
+const {
+  resendOtp,
+  register,
+  verifyOtp,
+  login,
+  refreshToken,
+  logout,
+  getMe,
+  getTechnicians,
+  updateProfile,
+  changePassword,
+  getMySkills,
+  updateMySkills,
+  googleAuth,
+} = require('../controllers/auth.controller');
 const { authMiddleware } = require('../middleware/auth.middleware');
 
 const router = Router();
 
 router.post(
-  '/send-otp',
+  '/otp/resend',
   [body('email').isEmail().normalizeEmail()],
-  sendOtp
+  resendOtp
 );
 
 router.post(
@@ -17,9 +31,17 @@ router.post(
     body('name').notEmpty().trim(),
     body('email').isEmail().normalizeEmail(),
     body('password').isLength({ min: 8 }),
-    body('otp').isLength({ min: 6, max: 6 }),
   ],
   register
+);
+
+router.post(
+  '/otp/verify',
+  [
+    body('email').isEmail().normalizeEmail(),
+    body('otp').isLength({ min: 6, max: 6 }),
+  ],
+  verifyOtp
 );
 
 router.post(
@@ -31,9 +53,14 @@ router.post(
   login
 );
 
-router.post('/refresh', refreshToken);
+router.post('/refresh-token', refreshToken);
+
+router.post('/logout', logout);
+router.post('/google', googleAuth);
 
 router.get('/me', authMiddleware, getMe);
+router.get('/me/skills', authMiddleware, getMySkills);
+router.put('/me/skills', authMiddleware, updateMySkills);
 router.patch('/profile', authMiddleware, updateProfile);
 router.patch('/change-password', authMiddleware, changePassword);
 router.get('/technicians', authMiddleware, getTechnicians);
