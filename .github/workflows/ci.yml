@@ -169,62 +169,44 @@ jobs:
     name: Integration — Full App Test
     runs-on: ubuntu-latest
     needs: [backend, frontend]
-    # Integration boot + teardown can take longer than unit tests
     timeout-minutes: 20
-
+  
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
+  
       - name: Setup Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          # Cache both lockfiles so neither side does a cold install
           cache: 'npm'
           cache-dependency-path: |
             backend/package-lock.json
             frontend/package-lock.json
-
+  
       - name: Install backend dependencies
         working-directory: backend
         run: npm ci
-
+  
       - name: Install frontend dependencies
         working-directory: frontend
         run: npm ci
-
-      # Install root-level dev deps if a root package.json exists
-      # (e.g. a test runner / supertest orchestrator at the repo root)
-      - name: Install root dependencies (if present)
-        run: |
-          if [ -f package.json ]; then
-            npm ci
-          else
-            echo "No root package.json found — skipping root install."
-          fi
-
+  
       - name: Run integration tests
         env:
           NODE_ENV: test
           JWT_SECRET: test-jwt-secret-ci
           REFRESH_TOKEN_SECRET: test-refresh-secret-ci
           PORT: 5001
-          # Use SQLite in-memory for integration tests too unless you
-          # add a MySQL service block above.
           DB_DIALECT: sqlite
-        # Adjust working-directory to wherever test:integration is defined.
-        # If it lives in backend/, change this to: working-directory: backend
-        # If it lives at repo root, remove the working-directory key entirely.
-        working-directory: backend
-        run: npm run test:integration -- --forceExit
-
+        # Runs: node tests/run-integration-tests.mjs from repo root
+        run: node tests/run-integration-tests.mjs
+  
       - name: Upload integration test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: integration-test-results
-          # Adjust path to wherever your runner writes its output
           path: backend/test-results/
           retention-days: 7
 
