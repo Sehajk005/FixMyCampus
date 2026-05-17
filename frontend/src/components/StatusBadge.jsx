@@ -10,7 +10,7 @@ const STYLES = {
 export default function StatusBadge({ status }) {
   const s = STYLES[status] || STYLES.closed;
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.68rem', fontWeight: 700, padding: '0.22rem 0.6rem', borderRadius: 99, background: s.bg, color: s.color, border: `1px solid ${s.border}`, letterSpacing: '0.04em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
+    <span className="motion-status-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.68rem', fontWeight: 700, padding: '0.22rem 0.6rem', borderRadius: 99, background: s.bg, color: s.color, border: `1px solid ${s.border}`, letterSpacing: '0.04em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
       <span style={{ width: 5, height: 5, borderRadius: '50%', background: s.color, display: 'inline-block', boxShadow: `0 0 6px ${s.color}` }} />
       {status?.replace('_', ' ')}
     </span>

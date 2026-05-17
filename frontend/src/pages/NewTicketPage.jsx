@@ -12,17 +12,30 @@ const PRIORITIES = [{v:'low',c:'#94a3b8'},{v:'medium',c:'#60a5fa'},{v:'high',c:'
 export default function NewTicketPage() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
-  const [form, setForm] = useState({ title:'', description:'', category: params.get('category')||'', location:'', priority:'medium' });
+  const [form, setForm] = useState({ title:'', description:'', category: params.get('category')||'', location:'', priority:'medium', is_anonymous: false });
+  const [photo, setPhoto] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [duplicateId, setDuplicateId] = useState(null);
 
   async function handleSubmit() {
-    setLoading(true); setError('');
+    setLoading(true); setError(''); setDuplicateId(null);
     try {
-      const res = await api.post('/tickets', form);
-      navigate(`/tickets/${res.data.id}`);
+      const formData = new FormData();
+      Object.keys(form).forEach(key => formData.append(key, form[key]));
+      if (photo) formData.append('photo', photo);
+
+      await api.post('/tickets', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      navigate(`/tickets`); // Redirect to My Tickets
     } catch (err) {
-      setError(err.response?.data?.error || err.response?.data?.errors?.[0]?.msg || 'Failed to submit');
+      if (err.response?.status === 409 && err.response?.data?.existing_ticket_id) {
+         setError(err.response.data.error || 'An open ticket already exists for this issue.');
+         setDuplicateId(err.response.data.existing_ticket_id);
+      } else {
+         setError(err.response?.data?.error || err.response?.data?.errors?.[0]?.msg || 'Failed to submit');
+      }
     } finally { setLoading(false); }
   }
 
@@ -31,14 +44,23 @@ export default function NewTicketPage() {
   return (
     <div style={{ maxWidth: 700, margin: '0 auto', padding: '2rem 1.5rem 6rem' }}>
       <div className="animate-fade-up" style={{ marginBottom: '2rem' }}>
-        <Link to="/dashboard" style={{ fontSize: '0.8rem', color: '#64748b', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.375rem', marginBottom: '1rem' }}>← Back</Link>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#f1f5f9', letterSpacing: '-0.02em' }}>Report an Issue</h1>
-        <p style={{ color: '#64748b', fontSize: '0.875rem', marginTop: '0.25rem' }}>Describe the problem and we'll get it fixed.</p>
+        <Link to="/dashboard" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.375rem', marginBottom: '1rem' }}>← Back</Link>
+        <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text)', letterSpacing: '-0.02em' }}>Report an Issue</h1>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginTop: '0.25rem' }}>Describe the problem and we'll get it fixed.</p>
       </div>
 
-      {error && <div className="alert-error animate-fade-in" style={{ marginBottom: '1.25rem' }}>⚠ {error}</div>}
+      {error && !duplicateId && <div className="alert-error animate-fade-in" style={{ marginBottom: '1.25rem' }}>⚠ {error}</div>}
+      
+      {duplicateId && (
+        <div style={{ background: 'rgba(239, 68, 68, 0.1)', padding: '1rem', borderRadius: '0.75rem', border: '1px solid rgba(239, 68, 68, 0.4)', marginBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          <span style={{ color: '#f87171', fontWeight: 600 }}>{error}</span>
+          <Link to={`/tickets/${duplicateId}`} style={{ color: '#fff', background: '#ef4444', padding: '0.5rem 1rem', borderRadius: '0.5rem', textDecoration: 'none', textAlign: 'center', display: 'inline-block', fontWeight: 600 }}>
+            View Existing Ticket
+          </Link>
+        </div>
+      )}
 
-      <div style={{ background: 'rgba(15,22,41,0.9)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '1.25rem', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }} className="animate-fade-up delay-100">
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '1.25rem', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }} className="animate-fade-up delay-100">
 
         <div>
           <label className="label">Issue Title</label>
@@ -50,9 +72,9 @@ export default function NewTicketPage() {
           <label className="label">Category</label>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.625rem' }}>
             {CATEGORIES.map(c => (
-              <button key={c.v} onClick={() => setForm(f=>({...f,category:c.v}))} style={{ padding: '0.75rem 0.5rem', borderRadius: '0.75rem', border: form.category === c.v ? '1px solid rgba(99,102,241,0.5)' : '1px solid rgba(255,255,255,0.07)', background: form.category === c.v ? 'rgba(99,102,241,0.15)' : 'rgba(255,255,255,0.03)', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.375rem', transition: 'all 0.15s' }}>
+              <button key={c.v} onClick={() => setForm(f=>({...f,category:c.v}))} style={{ padding: '0.75rem 0.5rem', borderRadius: '0.75rem', border: form.category === c.v ? '1px solid color-mix(in oklab, var(--accent) 45%, transparent)' : '1px solid var(--border)', background: form.category === c.v ? 'color-mix(in oklab, var(--accent) 18%, transparent)' : 'var(--surface2)', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.375rem', transition: 'all 0.15s' }}>
                 <span style={{ fontSize: '1.25rem' }}>{c.i}</span>
-                <span style={{ fontSize: '0.7rem', fontWeight: 600, color: form.category === c.v ? '#818cf8' : '#64748b' }}>{c.l}</span>
+                <span style={{ fontSize: '0.7rem', fontWeight: 600, color: form.category === c.v ? 'var(--accent)' : 'var(--text-muted)' }}>{c.l}</span>
               </button>
             ))}
           </div>
@@ -63,7 +85,7 @@ export default function NewTicketPage() {
           <label className="label">Priority</label>
           <div style={{ display: 'flex', gap: '0.625rem' }}>
             {PRIORITIES.map(p => (
-              <button key={p.v} onClick={() => setForm(f=>({...f,priority:p.v}))} style={{ flex: 1, padding: '0.5rem', borderRadius: '0.625rem', border: form.priority === p.v ? `1px solid ${p.c}50` : '1px solid rgba(255,255,255,0.07)', background: form.priority === p.v ? `${p.c}15` : 'rgba(255,255,255,0.03)', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700, color: form.priority === p.v ? p.c : '#64748b', transition: 'all 0.15s', textTransform: 'capitalize' }}>
+              <button key={p.v} onClick={() => setForm(f=>({...f,priority:p.v}))} style={{ flex: 1, padding: '0.5rem', borderRadius: '0.625rem', border: form.priority === p.v ? `1px solid ${p.c}50` : '1px solid var(--border)', background: form.priority === p.v ? `${p.c}15` : 'var(--surface2)', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700, color: form.priority === p.v ? p.c : 'var(--text-muted)', transition: 'all 0.15s', textTransform: 'capitalize' }}>
                 {p.v}
               </button>
             ))}
@@ -78,6 +100,22 @@ export default function NewTicketPage() {
         <div>
           <label className="label">Description</label>
           <textarea className="input-field" rows={5} placeholder="Describe the issue in detail — what happened, since when, how bad…" value={form.description} onChange={e => setForm(f=>({...f,description:e.target.value}))} style={{ resize: 'none' }} />
+        </div>
+        
+        <div>
+          <label className="label">Attach Photo (Optional)</label>
+          <input type="file" accept="image/*" onChange={e => setPhoto(e.target.files[0])} style={{ color: 'var(--text)' }} />
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <input 
+            type="checkbox" 
+            id="anonymous" 
+            checked={form.is_anonymous} 
+            onChange={e => setForm(f=>({...f, is_anonymous: e.target.checked}))} 
+            style={{ width: '1.2rem', height: '1.2rem', cursor: 'pointer' }}
+          />
+          <label htmlFor="anonymous" style={{ color: 'var(--text-muted)', fontSize: '0.9rem', cursor: 'pointer' }}>Submit Anonymously (Staff will not see your name)</label>
         </div>
 
         <div style={{ display: 'flex', gap: '0.75rem' }}>

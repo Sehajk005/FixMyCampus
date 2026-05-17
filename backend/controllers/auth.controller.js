@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const { v4: uuidv4 } = require('uuid');
 const { validationResult } = require('express-validator');
 const { User, OtpToken, RefreshToken, StaffSkill } = require('../models');
 const { sequelize } = require('../config/database');

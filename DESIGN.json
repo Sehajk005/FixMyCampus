@@ -1,0 +1,253 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-05-01T00:00:00.000Z",
+  "title": "Design System: FixMyCampus",
+  "extensions": {
+    "colorMeta": {
+      "accent": {
+        "role": "primary",
+        "displayName": "Institution Indigo",
+        "canonical": "oklch(57% 0.22 264)",
+        "tonalRamp": [
+          "oklch(12% 0.06 264)",
+          "oklch(20% 0.10 264)",
+          "oklch(30% 0.14 264)",
+          "oklch(42% 0.19 264)",
+          "oklch(57% 0.22 264)",
+          "oklch(67% 0.18 264)",
+          "oklch(76% 0.12 264)",
+          "oklch(88% 0.06 264)"
+        ]
+      },
+      "accent-teal": {
+        "role": "secondary",
+        "displayName": "Resolution Teal",
+        "canonical": "oklch(70% 0.15 185)",
+        "tonalRamp": [
+          "oklch(15% 0.05 185)",
+          "oklch(25% 0.08 185)",
+          "oklch(38% 0.11 185)",
+          "oklch(52% 0.14 185)",
+          "oklch(70% 0.15 185)",
+          "oklch(78% 0.12 185)",
+          "oklch(86% 0.08 185)",
+          "oklch(93% 0.04 185)"
+        ]
+      },
+      "accent-amber": {
+        "role": "tertiary",
+        "displayName": "Alert Amber",
+        "canonical": "oklch(77% 0.18 75)",
+        "tonalRamp": [
+          "oklch(18% 0.05 75)",
+          "oklch(30% 0.09 75)",
+          "oklch(44% 0.13 75)",
+          "oklch(58% 0.16 75)",
+          "oklch(77% 0.18 75)",
+          "oklch(83% 0.14 75)",
+          "oklch(89% 0.09 75)",
+          "oklch(95% 0.04 75)"
+        ]
+      },
+      "bg-base": {
+        "role": "neutral",
+        "displayName": "Midnight Canvas",
+        "canonical": "oklch(8% 0.02 264)",
+        "tonalRamp": [
+          "oklch(8% 0.02 264)",
+          "oklch(13% 0.03 264)",
+          "oklch(20% 0.04 264)",
+          "oklch(30% 0.05 264)",
+          "oklch(42% 0.05 264)",
+          "oklch(56% 0.05 264)",
+          "oklch(70% 0.04 264)",
+          "oklch(85% 0.02 264)"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Surface",
+        "canonical": "oklch(10% 0.025 264)",
+        "tonalRamp": [
+          "oklch(8% 0.02 264)",
+          "oklch(10% 0.025 264)",
+          "oklch(13% 0.03 264)",
+          "oklch(17% 0.04 264)",
+          "oklch(22% 0.04 264)",
+          "oklch(35% 0.04 264)",
+          "oklch(55% 0.04 264)",
+          "oklch(80% 0.02 264)"
+        ]
+      },
+      "text-primary": {
+        "role": "neutral",
+        "displayName": "Signal White",
+        "canonical": "oklch(94% 0.008 240)",
+        "tonalRamp": [
+          "oklch(15% 0.008 240)",
+          "oklch(30% 0.008 240)",
+          "oklch(45% 0.008 240)",
+          "oklch(58% 0.008 240)",
+          "oklch(70% 0.008 240)",
+          "oklch(80% 0.008 240)",
+          "oklch(88% 0.008 240)",
+          "oklch(94% 0.008 240)"
+        ]
+      },
+      "success": {
+        "role": "neutral",
+        "displayName": "Success Green",
+        "canonical": "oklch(72% 0.17 162)",
+        "tonalRamp": [
+          "oklch(18% 0.06 162)",
+          "oklch(28% 0.09 162)",
+          "oklch(40% 0.13 162)",
+          "oklch(53% 0.16 162)",
+          "oklch(72% 0.17 162)",
+          "oklch(80% 0.13 162)",
+          "oklch(88% 0.08 162)",
+          "oklch(94% 0.04 162)"
+        ]
+      },
+      "danger": {
+        "role": "neutral",
+        "displayName": "Fault Red",
+        "canonical": "oklch(62% 0.22 27)",
+        "tonalRamp": [
+          "oklch(18% 0.08 27)",
+          "oklch(28% 0.12 27)",
+          "oklch(40% 0.17 27)",
+          "oklch(52% 0.20 27)",
+          "oklch(62% 0.22 27)",
+          "oklch(72% 0.18 27)",
+          "oklch(82% 0.12 27)",
+          "oklch(92% 0.05 27)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display":  { "displayName": "Display",  "purpose": "Page-level greetings and primary headings. One per screen maximum." },
+      "headline": { "displayName": "Headline", "purpose": "Section titles, card headings, modal titles." },
+      "title":    { "displayName": "Title",    "purpose": "Ticket subject lines, table values, form section headers. Workhorse of dense screens." },
+      "body":     { "displayName": "Body",     "purpose": "Descriptions, ticket detail text, notification bodies. Capped at 70ch." },
+      "label":    { "displayName": "Label",    "purpose": "Form field labels, category names, data table column headers. Always uppercase 700 weight." },
+      "mono":     { "displayName": "Mono",     "purpose": "Ticket IDs, timestamps, technical metadata only. JetBrains Mono exclusively." }
+    },
+    "shadows": [
+      { "name": "hover-glow",       "value": "0 0 40px rgba(99,102,241,0.15)",  "purpose": "Interactive cards and stat tiles on hover." },
+      { "name": "focus-glow",       "value": "0 0 0 3px rgba(99,102,241,0.15)", "purpose": "Focused input fields, alongside border shift to Institution Indigo." },
+      { "name": "button-glow",      "value": "0 0 20px rgba(99,102,241,0.3)",   "purpose": "Primary button at rest. Intensifies to 0 0 30px rgba(99,102,241,0.5) on hover." },
+      { "name": "status-dot-glow",  "value": "0 0 6px <status-color>",          "purpose": "Leading dot in status badges. Replaced with the specific status color at runtime." }
+    ],
+    "motion": [
+      { "name": "ease-standard",  "value": "0.2s ease",                                    "purpose": "Default for all state transitions — hover, focus, active." },
+      { "name": "ease-fade-up",   "value": "0.5s ease both",                               "purpose": "Entrance animation for page sections and cards (translateY 20px to 0, opacity 0 to 1)." },
+      { "name": "ease-count",     "value": "0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both", "purpose": "Stat number entrance only. The only place a spring curve is permitted." },
+      { "name": "shimmer",        "value": "1.5s infinite",                                "purpose": "Skeleton loading shimmer animation." }
+    ],
+    "breakpoints": [
+      { "name": "mobile-nav", "value": "920px", "purpose": "Navigation collapses to hamburger toggle below this width." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The single highest-priority action on a screen. Submit ticket, confirm action. Used sparingly.",
+      "html": "<button class=\"ds-btn-primary\">Submit Report</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, #6366f1, #14b8a6); color: #ffffff; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 0.875rem; font-weight: 600; padding: 10px 20px; border-radius: 10px; border: none; cursor: pointer; box-shadow: 0 0 20px rgba(99,102,241,0.3); transition: all 0.2s ease; position: relative; overflow: hidden; } .ds-btn-primary::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent); opacity: 0; transition: opacity 0.2s ease; } .ds-btn-primary:hover::before { opacity: 1; } .ds-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 0 30px rgba(99,102,241,0.5); } .ds-btn-primary:focus-visible { outline: 2px solid #6366f1; outline-offset: 3px; } .ds-btn-primary:active { transform: translateY(0); } .ds-btn-primary:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Secondary actions: cancel, go back, view details. Never competes with the primary.",
+      "html": "<button class=\"ds-btn-secondary\">View Details</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: rgba(255,255,255,0.04); color: #94a3b8; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; padding: 10px 20px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.07); cursor: pointer; transition: all 0.2s ease; } .ds-btn-secondary:hover { background: rgba(255,255,255,0.08); color: #f1f5f9; border-color: rgba(255,255,255,0.15); } .ds-btn-secondary:focus-visible { outline: 2px solid #6366f1; outline-offset: 3px; }"
+    },
+    {
+      "name": "Status Badge",
+      "kind": "custom",
+      "refersTo": "status-badge",
+      "description": "Ticket lifecycle indicator. Always paired with a text label — color is redundant confirmation, not the primary signal.",
+      "html": "<span class=\"ds-status-badge ds-status-in-progress\"><span class=\"ds-status-dot\"></span>In Progress</span>",
+      "css": ".ds-status-badge { display: inline-flex; align-items: center; gap: 5px; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; padding: 4px 10px; border-radius: 9999px; } .ds-status-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; } .ds-status-submitted  { background: rgba(251,191,36,0.15);  color: #fbbf24; border: 1px solid rgba(251,191,36,0.3);  } .ds-status-submitted  .ds-status-dot { background: #fbbf24; box-shadow: 0 0 6px #fbbf24; } .ds-status-verified   { background: rgba(96,165,250,0.15);  color: #60a5fa; border: 1px solid rgba(96,165,250,0.3);  } .ds-status-verified   .ds-status-dot { background: #60a5fa; box-shadow: 0 0 6px #60a5fa; } .ds-status-assigned   { background: rgba(167,139,250,0.15); color: #a78bfa; border: 1px solid rgba(167,139,250,0.3); } .ds-status-assigned   .ds-status-dot { background: #a78bfa; box-shadow: 0 0 6px #a78bfa; } .ds-status-in-progress{ background: rgba(251,146,60,0.15);  color: #fb923c; border: 1px solid rgba(251,146,60,0.3);  } .ds-status-in-progress .ds-status-dot { background: #fb923c; box-shadow: 0 0 6px #fb923c; } .ds-status-resolved   { background: rgba(52,211,153,0.15);  color: #34d399; border: 1px solid rgba(52,211,153,0.3);  } .ds-status-resolved   .ds-status-dot { background: #34d399; box-shadow: 0 0 6px #34d399; } .ds-status-closed     { background: rgba(148,163,184,0.10); color: #94a3b8; border: 1px solid rgba(148,163,184,0.2); } .ds-status-closed     .ds-status-dot { background: #94a3b8; box-shadow: 0 0 4px #94a3b8; }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Standard container for grouped content. Flat at rest; lifts on hover when interactive.",
+      "html": "<div class=\"ds-card\"><p class=\"ds-card-label\">Category</p><p class=\"ds-card-title\">Electrical fault in Lab 3B</p><p class=\"ds-card-body\">The main power strip near the windows has stopped working. Three workstations are affected.</p></div>",
+      "css": ".ds-card { background: #0f1629; border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 24px; transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; } .ds-card:hover { border-color: rgba(99,102,241,0.4); box-shadow: 0 0 40px rgba(99,102,241,0.15); transform: translateY(-2px); } .ds-card-label { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #94a3b8; margin: 0 0 8px; } .ds-card-title { font-size: 1rem; font-weight: 700; color: #f1f5f9; margin: 0 0 10px; line-height: 1.4; } .ds-card-body { font-size: 0.875rem; color: #94a3b8; margin: 0; line-height: 1.6; max-width: 70ch; }"
+    },
+    {
+      "name": "Stat Tile",
+      "kind": "card",
+      "refersTo": "stat-card",
+      "description": "Displays a single key metric. Lifts on hover.",
+      "html": "<div class=\"ds-stat-tile\"><div class=\"ds-stat-value\" style=\"color:#34d399\">12</div><div class=\"ds-stat-label\">Resolved</div></div>",
+      "css": ".ds-stat-tile { background: #151d35; border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 20px 24px; transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; cursor: default; } .ds-stat-tile:hover { border-color: rgba(99,102,241,0.4); box-shadow: 0 0 40px rgba(99,102,241,0.15); transform: translateY(-3px); } .ds-stat-value { font-size: 2.25rem; font-weight: 800; line-height: 1; margin-bottom: 6px; } .ds-stat-label { font-size: 0.8rem; font-weight: 500; color: #94a3b8; }"
+    },
+    {
+      "name": "Input Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Standard text input. Label always visible above the field.",
+      "html": "<div class=\"ds-field\"><label class=\"ds-field-label\" for=\"ds-input-demo\">Location</label><input class=\"ds-input\" id=\"ds-input-demo\" type=\"text\" placeholder=\"e.g. Block C, Room 204\" /></div>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 6px; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; } .ds-field-label { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #94a3b8; } .ds-input { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 10px 14px; font-size: 0.875rem; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #f1f5f9; outline: none; transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease; } .ds-input::placeholder { color: #94a3b8; } .ds-input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.15); background: rgba(99,102,241,0.05); }"
+    },
+    {
+      "name": "Navigation Link",
+      "kind": "nav",
+      "refersTo": "button-secondary",
+      "description": "Top navigation link. Quiet at rest; fills with a soft indigo tint on hover and active.",
+      "html": "<nav class=\"ds-nav-demo\"><a class=\"ds-nav-link\" href=\"#\">Dashboard</a><a class=\"ds-nav-link ds-nav-active\" href=\"#\">My Tickets</a><a class=\"ds-nav-link\" href=\"#\">Profile</a></nav>",
+      "css": ".ds-nav-demo { display: flex; align-items: center; gap: 4px; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; } .ds-nav-link { color: #94a3b8; text-decoration: none; font-size: 0.83rem; font-weight: 700; padding: 8px 12px; border-radius: 8px; transition: color 0.2s ease, background 0.2s ease; } .ds-nav-link:hover { color: #f1f5f9; background: rgba(99,102,241,0.16); } .ds-nav-active { color: #f1f5f9; background: rgba(99,102,241,0.15); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Campus Signal",
+    "overview": "FixMyCampus is built for people in motion. A student notices a broken light on the way to class — the report takes 45 seconds, the confirmation is instant, the status is always visible. That physical context shapes every decision: high contrast, generous touch targets, clear hierarchy, no clutter.\n\nThe system serves three distinct roles. Students need speed and reassurance. Technicians need density and efficiency. Admins need overview and control. Each role gets what it needs; none are forced into a shared visual template.\n\nThe aesthetic is civic, not startup. Structured, authoritative, built to last — without the coldness of government grey or the performative energy of a startup dashboard.",
+    "keyCharacteristics": [
+      "Dark-first, light-optional: deep layered navy, not decorative darkness",
+      "Status-forward: ticket state is the dominant information on every relevant screen",
+      "Role-stratified density: student screens breathe; staff and admin screens are denser by design",
+      "Civic not corporate: trustworthy and structured without feeling cold",
+      "Outdoor-legible: contrast targets exceed WCAG AA — body text aims for AAA"
+    ],
+    "rules": [
+      { "name": "The One Signal Rule",      "body": "Institution Indigo appears on interactive elements and active states only. Never as a decorative fill or overlay. Rarity is what gives it weight.",                                        "section": "colors" },
+      { "name": "The Semantic Fence Rule",  "body": "Alert Amber, Success Green, and Fault Red are semantic tokens. Reassigning them to non-semantic roles breaks the contract users learn to read.",                          "section": "colors" },
+      { "name": "The Color-Plus Rule",      "body": "Status colors are never the sole carrier of meaning. Every badge includes a text label and dot. Color confirms; it does not replace.",                                     "section": "colors" },
+      { "name": "The Scale Commitment Rule","body": "Adjacent hierarchy levels must differ by at least 1.25x in size or a two-step weight jump. Weight-only variation at a single size produces a flat scale.",              "section": "typography" },
+      { "name": "The 70-Character Rule",    "body": "Body text is capped at 70ch. Ticket descriptions and notification text never stretch wider.",                                                                             "section": "typography" },
+      { "name": "The Mono Boundary Rule",   "body": "JetBrains Mono is for data identifiers only. Mixing it with Plus Jakarta Sans on the same element is prohibited.",                                                        "section": "typography" },
+      { "name": "The Flat-at-Rest Rule",    "body": "Surfaces are flat at rest. Glows appear only in response to user interaction. An idle interface with glowing elements is noise.",                                        "section": "elevation" },
+      { "name": "The Tonal Ladder Rule",    "body": "Depth is communicated through surface color steps. An element that needs to feel elevated uses Surface Raised or Surface High — not an added drop shadow.",              "section": "elevation" }
+    ],
+    "dos": [
+      "Do use Institution Indigo on interactive elements and active states only.",
+      "Do pair every status color with a text label and a visual dot.",
+      "Do use the tonal surface ladder (Surface, Surface Raised, Surface High) to express depth.",
+      "Do size touch targets to a minimum of 44x44px on student-facing screens.",
+      "Do target WCAG AAA contrast ratios on body text where feasible.",
+      "Do show skeletons in the exact shape of the content they precede.",
+      "Do use JetBrains Mono for ticket IDs, timestamps, and technical identifiers.",
+      "Do respect prefers-reduced-motion globally."
+    ],
+    "donts": [
+      "Don't build social media patterns: no infinite scroll, no engagement metrics.",
+      "Don't build gaming UIs: no decorative neon glow, no particle effects, no animated backgrounds.",
+      "Don't build SaaS marketing dashboards: no hero-metric template, no marketing copy inside the app.",
+      "Don't use border-left or border-right greater than 1px as a colored accent stripe on cards or alerts.",
+      "Don't use gradient text (background-clip: text with a gradient background).",
+      "Don't reach for a modal first. Inline states and progressive disclosure handle most cases.",
+      "Don't use card-glass on dashboard surfaces.",
+      "Don't flatten the type scale. Adjacent hierarchy levels must differ by at least 1.25x.",
+      "Don't use Alert Amber, Success Green, or Fault Red for non-semantic decoration.",
+      "Don't use color alone to convey status or priority."
+    ]
+  }
+}

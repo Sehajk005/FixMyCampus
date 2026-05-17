@@ -44,7 +44,7 @@ export default function AdminTickets() {
   });
 
   if (loading) return (
-    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '2rem 1.5rem' }}>
+    <div className="motion-surface-enter" style={{ maxWidth: 1200, margin: '0 auto', padding: '2rem 1.5rem' }}>
       {[1,2,3,4].map(i => <div key={i} className="skeleton" style={{ height: 100, borderRadius: '1rem', marginBottom: '0.75rem' }} />)}
     </div>
   );
@@ -54,16 +54,16 @@ export default function AdminTickets() {
       {/* Header */}
       <div className="animate-fade-up" style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
         <div style={{ flex: 1 }}>
-          <Link to="/admin" style={{ fontSize: '0.78rem', color: '#64748b', textDecoration: 'none' }}>← Dashboard</Link>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#f1f5f9', letterSpacing: '-0.02em', marginTop: '0.25rem' }}>
+          <Link to="/admin" style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textDecoration: 'none' }}>← Dashboard</Link>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text)', letterSpacing: '-0.02em', marginTop: '0.25rem' }}>
             All Tickets
-            <span style={{ marginLeft: '0.75rem', fontSize: '1rem', fontWeight: 600, color: '#64748b' }}>({filtered.length})</span>
+            <span style={{ marginLeft: '0.75rem', fontSize: '1rem', fontWeight: 600, color: 'var(--text-muted)' }}>({filtered.length})</span>
           </h1>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="animate-fade-up delay-100" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1.5rem', padding: '1rem 1.25rem', background: 'rgba(15,22,41,0.8)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '1rem' }}>
+      <div className="animate-fade-up delay-100" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1.5rem', padding: '1rem 1.25rem', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '1rem' }}>
         <input
           className="input-field" placeholder="Search title, student, location…"
           value={search} onChange={e => setSearch(e.target.value)}
@@ -79,7 +79,7 @@ export default function AdminTickets() {
         </select>
         {(filterStatus !== 'all' || filterPriority !== 'all' || search) && (
           <button onClick={() => { setFilterStatus('all'); setFilterPriority('all'); setSearch(''); }}
-            style={{ fontSize: '0.8rem', color: '#818cf8', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>
+            style={{ fontSize: '0.8rem', color: 'var(--accent)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>
             Clear ✕
           </button>
         )}
@@ -87,7 +87,7 @@ export default function AdminTickets() {
 
       {/* Ticket rows */}
       {filtered.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '4rem', color: '#64748b' }}>
+        <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
           <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔍</div>
           <p>No tickets match your filters.</p>
         </div>
@@ -100,7 +100,7 @@ export default function AdminTickets() {
 
             return (
               <div key={t.id} className={`animate-fade-up delay-${Math.min(i*100+100, 600)}`}
-                style={{ background: 'rgba(15,22,41,0.9)', border: `1px solid rgba(255,255,255,0.07)`, borderRadius: '1rem', padding: '1.125rem 1.5rem', opacity: updating === t.id ? 0.5 : 1, transition: 'all 0.2s' }}>
+                style={{ background: 'var(--surface)', border: `1px solid var(--border)`, borderRadius: '1rem', padding: '1.125rem 1.5rem', opacity: updating === t.id ? 0.5 : 1, transition: 'all 0.2s' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
 
                   {/* Info */}
@@ -108,14 +108,14 @@ export default function AdminTickets() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.4rem' }}>
                       <StatusBadge status={t.status} />
                       <span style={{ fontSize: '0.72rem', fontWeight: 700, color: PRIORITY_COLORS[t.priority] }}>{t.priority}</span>
-                      <span style={{ fontSize: '0.72rem', color: '#64748b', textTransform: 'capitalize' }}>{t.category?.replace('_',' ')}</span>
+                      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'capitalize' }}>{t.category?.replace('_',' ')}</span>
                     </div>
-                    <p style={{ fontSize: '0.9rem', fontWeight: 700, color: '#f1f5f9', marginBottom: '0.25rem' }}>{t.title}</p>
-                    <p style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                    <p style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text)', marginBottom: '0.25rem' }}>{t.title}</p>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                       📍 {t.location} · 👤 {t.submitter?.name} · {new Date(t.createdAt).toLocaleDateString()}
                     </p>
                     {assignedName && (
-                      <p style={{ fontSize: '0.72rem', color: '#67e8f9', marginTop: '0.2rem' }}>
+                      <p style={{ fontSize: '0.72rem', color: 'var(--accent2)', marginTop: '0.2rem' }}>
                         🔧 Assigned to: <strong>{assignedName}</strong>
                       </p>
                     )}
@@ -128,9 +128,9 @@ export default function AdminTickets() {
                       value={t.status}
                       onChange={e => updateTicket(t.id, { status: e.target.value })}
                       disabled={updating === t.id}
-                      style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', color: '#f1f5f9', fontSize: '0.8rem', padding: '0.45rem 0.75rem', borderRadius: '0.625rem', cursor: 'pointer', outline: 'none' }}
+                      style={{ background: 'var(--surface2)', border: '1px solid var(--border)', color: 'var(--text)', fontSize: '0.8rem', padding: '0.45rem 0.75rem', borderRadius: '0.625rem', cursor: 'pointer', outline: 'none' }}
                     >
-                      {STATUSES.map(s => <option key={s} value={s} style={{ background: '#1e2a45' }}>{s.replace('_',' ')}</option>)}
+                      {STATUSES.map(s => <option key={s} value={s} style={{ background: 'var(--surface)' }}>{s.replace('_',' ')}</option>)}
                     </select>
 
                     {/* Assign dropdown */}
@@ -138,15 +138,15 @@ export default function AdminTickets() {
                       value={t.assigned_to || ''}
                       onChange={e => updateTicket(t.id, { assigned_to: e.target.value || null, status: e.target.value ? 'assigned' : t.status })}
                       disabled={updating === t.id}
-                      style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', color: t.assigned_to ? '#67e8f9' : '#94a3b8', fontSize: '0.8rem', padding: '0.45rem 0.75rem', borderRadius: '0.625rem', cursor: 'pointer', outline: 'none' }}
+                      style={{ background: 'var(--surface2)', border: '1px solid var(--border)', color: t.assigned_to ? 'var(--accent2)' : 'var(--text-muted)', fontSize: '0.8rem', padding: '0.45rem 0.75rem', borderRadius: '0.625rem', cursor: 'pointer', outline: 'none' }}
                     >
-                      <option value="" style={{ background: '#1e2a45' }}>Unassigned</option>
+                      <option value="" style={{ background: 'var(--surface)' }}>Unassigned</option>
                       {technicians.map(tech => (
-                        <option key={tech.id} value={tech.id} style={{ background: '#1e2a45' }}>{tech.name}</option>
+                        <option key={tech.id} value={tech.id} style={{ background: 'var(--surface)' }}>{tech.name}</option>
                       ))}
                     </select>
 
-                    <Link to={`/tickets/${t.id}`} style={{ padding: '0.45rem 1rem', borderRadius: '0.625rem', fontSize: '0.8rem', fontWeight: 600, background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.25)', color: '#818cf8', textDecoration: 'none', whiteSpace: 'nowrap' }}>
+                    <Link to={`/tickets/${t.id}`} style={{ padding: '0.45rem 1rem', borderRadius: '0.625rem', fontSize: '0.8rem', fontWeight: 600, background: 'color-mix(in oklab, var(--accent) 16%, transparent)', border: '1px solid color-mix(in oklab, var(--accent) 35%, transparent)', color: 'var(--accent)', textDecoration: 'none', whiteSpace: 'nowrap' }}>
                       View →
                     </Link>
                   </div>

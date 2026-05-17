@@ -1,18 +1,24 @@
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
 const authRoutes = require('./routes/auth.routes');
 const ticketRoutes = require('./routes/ticket.routes');
+const adminRoutes = require('./routes/admin.routes');
 
 const app = express();
+// Security and middleware
+const applySecurity = require('./middleware/security');
+applySecurity(app);
 
-// Middleware
+// CORS + parsers
 app.use(cors({
   origin: process.env.CLIENT_URL || 'http://localhost:5173',
   credentials: true,
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // Health check (BE-01)
 app.get('/api/health', (req, res) => {
@@ -24,21 +30,26 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Routes
-app.use('/auth', authRoutes);
-app.use('/tickets', ticketRoutes);
+// Swagger API docs
+const mountSwagger = require('./swagger');
+mountSwagger(app);
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({ error: 'Route not found' });
-});
+// Rate limiters
+const { authLimiter, ticketLimiter, globalLimiter } = require('./middleware/rateLimit');
 
-// Global error handler
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(err.status || 500).json({
-    error: err.message || 'Internal Server Error',
-  });
-});
+// Apply global limiter first
+app.use(globalLimiter);
+
+// Routes (scoped rate limits)
+app.use('/auth', authLimiter, authRoutes);
+app.use('/tickets', ticketLimiter, ticketRoutes);
+app.use('/admin', adminRoutes);
+
+// Finalize middleware (call AFTER all routes including GraphQL are registered)
+function finalize() {
+  const { applyErrorHandlers } = require('./middleware/errorHandler');
+  applyErrorHandlers(app);
+}
 
 module.exports = app;
+module.exports.finalize = finalize;

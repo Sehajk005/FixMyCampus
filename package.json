@@ -1,0 +1,12 @@
+{
+  "name": "fixmycampus-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test:backend": "npm --prefix backend test",
+    "test:frontend": "npm --prefix frontend test",
+    "test:integration": "node tests/run-integration-tests.mjs",
+    "test": "npm run test:backend && npm run test:frontend && npm run test:integration",
+    "test:all": "pwsh -NoProfile -ExecutionPolicy Bypass -File ./tests/run-tests.ps1"
+  }
+}

@@ -1,162 +1,101 @@
-import { useState, useEffect } from 'react';
+import { gql } from '@apollo/client';
+import { useQuery } from '@apollo/client/react';
 import { Link } from 'react-router-dom';
-import api from '../services/api';
-import StatusBadge from '../components/StatusBadge';
+import StatsCard from '../components/analytics/StatsCard';
+import BarChart from '../components/analytics/BarChart';
+import PieChart from '../components/analytics/PieChart';
+import LineChart from '../components/analytics/LineChart';
+import WorkloadTable from '../components/analytics/WorkloadTable';
+import PageLoading from '../components/PageLoading';
 
-const STATUSES = ['submitted', 'verified', 'assigned', 'in_progress', 'resolved', 'closed'];
-const STATUS_COLORS = {
-  submitted:   'bg-yellow-400',
-  verified:    'bg-blue-400',
-  assigned:    'bg-purple-400',
-  in_progress: 'bg-orange-400',
-  resolved:    'bg-green-400',
-  closed:      'bg-gray-400',
-};
-
-const CATEGORY_ICONS = {
-  electrical: '⚡', wifi: '📶', plumbing: '🔧',
-  cleanliness: '🧹', furniture: '🪑', ac_hvac: '❄️',
-  security: '🔒', other: '📋',
-};
+const ADMIN_DASHBOARD_QUERY = gql`
+  query GetAdminDashboard {
+    ticketStats {
+      total
+      submitted
+      in_progress
+      resolved
+      closed
+    }
+    technicianWorkload {
+      id
+      name
+      active_tickets
+      completed_tickets
+      avg_resolution_time
+      score
+    }
+    avgResolutionTime {
+      date
+      avg_hours
+    }
+    ticketsByCategory {
+      category
+      count
+    }
+    priorityDistribution {
+      priority
+      count
+    }
+  }
+`;
 
 export default function AdminDashboard() {
-  const [tickets, setTickets] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data, loading, error } = useQuery(ADMIN_DASHBOARD_QUERY);
 
-  useEffect(() => {
-    api.get('/tickets/all')
-      .then(r => setTickets(r.data))
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
+  if (loading) return <PageLoading label="Loading analytics…" />;
 
-  // Stats
-  const total = tickets.length;
-  const byStatus = STATUSES.reduce((acc, s) => {
-    acc[s] = tickets.filter(t => t.status === s).length;
-    return acc;
-  }, {});
-  const byCategory = tickets.reduce((acc, t) => {
-    acc[t.category] = (acc[t.category] || 0) + 1;
-    return acc;
-  }, {});
-  const critical = tickets.filter(t => t.priority === 'critical').length;
-  const open = tickets.filter(t => !['resolved', 'closed'].includes(t.status)).length;
-
-  const recent = [...tickets].slice(0, 5);
-
-  if (loading) return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-      <div className="text-slate-400 text-sm animate-pulse">Loading dashboard…</div>
+  if (error) return (
+    <div className="motion-surface-enter" style={{ minHeight: '70vh', display: 'grid', placeItems: 'center', color: 'var(--danger)', padding: '2rem' }}>
+      <div>Error loading dashboard: {error.message}</div>
     </div>
   );
 
+  const stats = data.ticketStats;
+  const activeTickets = stats.submitted + stats.in_progress;
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 pb-20">
-      {/* Header */}
-      <div className="border-b border-slate-800 px-6 py-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-white">Admin Dashboard</h1>
-          <p className="text-slate-400 text-xs mt-0.5">Fix My Campus · Chitkara University</p>
-        </div>
-        <Link to="/admin/tickets" className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors">
-          Manage Tickets →
-        </Link>
-      </div>
-
-      <div className="max-w-6xl mx-auto px-6 py-6 space-y-6">
-
-        {/* Top stat cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { label: 'Total Tickets', value: total, color: 'text-white', bg: 'bg-slate-800' },
-            { label: 'Open / Active', value: open, color: 'text-orange-400', bg: 'bg-slate-800' },
-            { label: 'Critical', value: critical, color: 'text-red-400', bg: 'bg-slate-800' },
-            { label: 'Resolved', value: byStatus.resolved + byStatus.closed, color: 'text-green-400', bg: 'bg-slate-800' },
-          ].map(s => (
-            <div key={s.label} className={`${s.bg} rounded-xl p-5 border border-slate-700`}>
-              <div className={`text-3xl font-bold ${s.color}`}>{s.value}</div>
-              <div className="text-slate-400 text-xs mt-1">{s.label}</div>
-            </div>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-          {/* Status breakdown */}
-          <div className="bg-slate-800 rounded-xl border border-slate-700 p-5">
-            <h2 className="text-sm font-semibold text-slate-300 mb-4">Tickets by Status</h2>
-            <div className="space-y-3">
-              {STATUSES.map(s => {
-                const count = byStatus[s] || 0;
-                const pct = total ? Math.round((count / total) * 100) : 0;
-                return (
-                  <div key={s}>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="text-slate-300 capitalize">{s.replace('_', ' ')}</span>
-                      <span className="text-slate-400">{count}</span>
-                    </div>
-                    <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full rounded-full ${STATUS_COLORS[s]} transition-all duration-700`}
-                        style={{ width: `${pct}%` }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '2rem 1.25rem 6rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+        <div className="animate-fade-up" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+          <div>
+            <p style={{ fontSize: '0.76rem', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent2)' }}>Operations</p>
+            <h1 style={{ fontSize: '1.9rem', fontWeight: 800, color: 'var(--text)', letterSpacing: '-0.02em' }}>Admin Analytics Dashboard</h1>
+            <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)' }}>Comprehensive overview of ticket flow and team performance.</p>
           </div>
-
-          {/* Category breakdown */}
-          <div className="bg-slate-800 rounded-xl border border-slate-700 p-5">
-            <h2 className="text-sm font-semibold text-slate-300 mb-4">Tickets by Category</h2>
-            <div className="grid grid-cols-2 gap-2">
-              {Object.entries(byCategory).sort((a, b) => b[1] - a[1]).map(([cat, count]) => (
-                <div key={cat} className="flex items-center gap-2 bg-slate-700/50 rounded-lg px-3 py-2">
-                  <span className="text-lg">{CATEGORY_ICONS[cat] || '📋'}</span>
-                  <div>
-                    <div className="text-xs text-slate-300 capitalize">{cat.replace('_', ' ')}</div>
-                    <div className="text-sm font-bold text-white">{count}</div>
-                  </div>
-                </div>
-              ))}
-              {Object.keys(byCategory).length === 0 && (
-                <p className="text-slate-500 text-xs col-span-2">No tickets yet</p>
-              )}
-            </div>
+          <div style={{ display: 'flex', gap: '0.7rem', flexWrap: 'wrap' }}>
+            <Link to="/admin/users" className="btn-secondary">Manage Users</Link>
+            <Link to="/admin/tickets" className="btn-primary">Manage Tickets</Link>
           </div>
         </div>
 
-        {/* Recent tickets */}
-        <div className="bg-slate-800 rounded-xl border border-slate-700 p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-slate-300">Recent Tickets</h2>
-            <Link to="/admin/tickets" className="text-xs text-blue-400 hover:text-blue-300">View all →</Link>
+        <div className="animate-fade-up delay-100" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.9rem' }}>
+          <StatsCard title="Total Tickets" value={stats.total} color="border-blue-500" icon={<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>} />
+          <StatsCard title="Active / Open" value={activeTickets} color="border-yellow-500" icon={<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>} />
+          <StatsCard title="Resolved" value={stats.resolved} color="border-green-500" icon={<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>} />
+          <StatsCard title="Closed" value={stats.closed} color="border-gray-500" icon={<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>} />
+        </div>
+
+        <div className="animate-fade-up delay-200" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))', gap: '1rem' }}>
+          <div className="card card-hover">
+            <h2 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text)', marginBottom: '1rem' }}>Tickets by Category</h2>
+            <BarChart data={data.ticketsByCategory} dataKey="count" xAxisKey="category" />
           </div>
-          <div className="space-y-2">
-            {recent.length === 0 ? (
-              <p className="text-slate-500 text-sm">No tickets yet.</p>
-            ) : recent.map(t => (
-              <Link key={t.id} to={`/tickets/${t.id}`}
-                className="flex items-center justify-between p-3 rounded-lg bg-slate-700/50 hover:bg-slate-700 transition-colors">
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-white font-medium truncate">{t.title}</p>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    {t.submitter?.name} · {t.location}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2 ml-3">
-                  <StatusBadge status={t.status} />
-                  <span className={`text-xs font-medium ${t.priority === 'critical' ? 'text-red-400' : t.priority === 'high' ? 'text-orange-400' : 'text-slate-400'}`}>
-                    {t.priority}
-                  </span>
-                </div>
-              </Link>
-            ))}
+          <div className="card card-hover">
+            <h2 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text)', marginBottom: '1rem' }}>Priority Distribution</h2>
+            <PieChart data={data.priorityDistribution} nameKey="priority" dataKey="count" />
           </div>
         </div>
 
+        <div className="card card-hover animate-fade-up delay-300">
+          <h2 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text)', marginBottom: '1rem' }}>Resolution Time Trend</h2>
+          <LineChart data={data.avgResolutionTime} dataKey="avg_hours" xAxisKey="date" />
+        </div>
+
+        <div className="card card-hover animate-fade-up delay-400" style={{ paddingBottom: '0.5rem' }}>
+          <h2 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text)' }}>Technician Workload</h2>
+          <WorkloadTable data={data.technicianWorkload} />
+        </div>
       </div>
     </div>
   );

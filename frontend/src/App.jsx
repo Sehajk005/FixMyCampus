@@ -1,28 +1,26 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import React, { Suspense } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
-import AdminRoute from './components/AdminRoute';
-import StaffRoute from './components/StaffRoute';
 import Navbar from './components/Navbar';
 import TechStackFooter from './components/TechStackFooter';
+import PageLoading from './components/PageLoading';
 
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-
-// Student
-import DashboardPage from './pages/DashboardPage';
 import TicketsPage from './pages/TicketsPage';
 import NewTicketPage from './pages/NewTicketPage';
-import TicketDetailPage from './pages/TicketDetailPage';
 import ProfilePage from './pages/ProfilePage';
 
-// Admin
-import AdminDashboard from './pages/AdminDashboard';
-import AdminTickets from './pages/AdminTickets';
-
-// Staff
-import StaffDashboard from './pages/StaffDashboard';
-import StaffHistory from './pages/StaffHistory';
+// Lazy-loaded pages
+const DashboardPage = React.lazy(() => import('./pages/DashboardPage'));
+const TicketDetailPage = React.lazy(() => import('./pages/TicketDetailPage'));
+const PublicFeed = React.lazy(() => import('./pages/PublicFeed'));
+const AdminDashboard = React.lazy(() => import('./pages/AdminDashboard'));
+const AdminTickets = React.lazy(() => import('./pages/AdminTickets'));
+const AdminUsers = React.lazy(() => import('./pages/AdminUsers'));
+const StaffDashboard = React.lazy(() => import('./pages/StaffDashboard'));
+const StaffHistory = React.lazy(() => import('./pages/StaffHistory'));
 
 function RootRedirect() {
   const { user, isAuthenticated } = useAuth();
@@ -32,33 +30,48 @@ function RootRedirect() {
   return <Navigate to="/dashboard" replace />;
 }
 
+function AppRoutes() {
+  const location = useLocation();
+  return (
+    <div key={location.pathname} className="page-route-enter">
+      <Routes location={location}>
+        <Route path="/" element={<RootRedirect />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/feed" element={<PublicFeed />} />
+
+        {/* Student */}
+        <Route path="/dashboard" element={<ProtectedRoute roles={['student']}><DashboardPage /></ProtectedRoute>} />
+        <Route path="/tickets" element={<ProtectedRoute roles={['student']}><TicketsPage /></ProtectedRoute>} />
+        <Route path="/tickets/new" element={<ProtectedRoute roles={['student']}><NewTicketPage /></ProtectedRoute>} />
+        <Route path="/tickets/:id" element={<ProtectedRoute><TicketDetailPage /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+
+        {/* Admin */}
+        <Route path="/admin" element={<ProtectedRoute roles={['admin']}><AdminDashboard /></ProtectedRoute>} />
+        <Route path="/admin/tickets" element={<ProtectedRoute roles={['admin']}><AdminTickets /></ProtectedRoute>} />
+        <Route path="/admin/users" element={<ProtectedRoute roles={['admin']}><AdminUsers /></ProtectedRoute>} />
+
+        {/* Staff */}
+        <Route path="/staff" element={<ProtectedRoute roles={['technician']}><StaffDashboard /></ProtectedRoute>} />
+        <Route path="/staff/history" element={<ProtectedRoute roles={['technician']}><StaffHistory /></ProtectedRoute>} />
+
+        <Route path="*" element={<RootRedirect />} />
+      </Routes>
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Navbar />
-        <Routes>
-          <Route path="/" element={<RootRedirect />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-
-          {/* Student */}
-          <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-          <Route path="/tickets" element={<ProtectedRoute><TicketsPage /></ProtectedRoute>} />
-          <Route path="/tickets/new" element={<ProtectedRoute><NewTicketPage /></ProtectedRoute>} />
-          <Route path="/tickets/:id" element={<ProtectedRoute><TicketDetailPage /></ProtectedRoute>} />
-          <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-
-          {/* Admin */}
-          <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-          <Route path="/admin/tickets" element={<AdminRoute><AdminTickets /></AdminRoute>} />
-
-          {/* Staff */}
-          <Route path="/staff" element={<StaffRoute><StaffDashboard /></StaffRoute>} />
-          <Route path="/staff/history" element={<StaffRoute><StaffHistory /></StaffRoute>} />
-
-          <Route path="*" element={<RootRedirect />} />
-        </Routes>
+        <main className="main-content-shell">
+          <Suspense fallback={<PageLoading />}>
+            <AppRoutes />
+          </Suspense>
+        </main>
         <TechStackFooter />
       </BrowserRouter>
     </AuthProvider>

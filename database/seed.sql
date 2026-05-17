@@ -10,7 +10,7 @@ USE fixmycampus_db;
 -- Run: node backend/scripts/fix-passwords.js
 INSERT INTO users (id, name, email, password_hash, role, is_verified, department) VALUES
   ('u-admin-00001', 'Admin User',   'admin@chitkara.edu',   'Test@1234', 'admin',      1, 'Administration'),
-  ('u-tech-000001', 'Rahul Verma',  'rahul.v@chitkara.edu', 'Test@1234', 'technician', 1, 'Facilities'),
+  ('u-tech-000001', 'Rahul Verma',  '', 'Test@1234', 'technician', 1, 'Facilities'),
   ('u-tech-000002', 'Pooja Sharma', 'pooja.s@chitkara.edu', 'Test@1234', 'technician', 1, 'Electrical'),
   ('u-stu-0000001', 'Arjun Mehta',  'arjun.m@chitkara.edu', 'Test@1234', 'student',    1, 'Computer Science'),
   ('u-stu-0000002', 'Priya Nair',   'priya.n@chitkara.edu', 'Test@1234', 'student',    1, 'Electronics'),

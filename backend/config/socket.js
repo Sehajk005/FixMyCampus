@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const { Message } = require('../models/Message');
 
 let io;
+const onlineUsers = new Map(); // socket.id -> { userId, role }
 
 function initSocket(server) {
   io = new Server(server, {
@@ -29,6 +30,13 @@ function initSocket(server) {
 
   io.on('connection', (socket) => {
     console.log(`🔌  Socket connected: ${socket.user.email} [${socket.id}]`);
+    
+    // Track online user
+    onlineUsers.set(socket.id, { userId: socket.user.id, role: socket.user.role });
+    io.emit('presence', Array.from(onlineUsers.values()));
+
+    // Join personal room for notifications
+    socket.join(`user:${socket.user.id}`);
 
     // Join ticket room (ORM-10)
     socket.on('join_room', (ticketId) => {
@@ -64,8 +72,19 @@ function initSocket(server) {
       socket.leave(`ticket:${ticketId}`);
     });
 
+    // Typing indicators
+    socket.on('typing', ({ ticketId }) => {
+      socket.to(`ticket:${ticketId}`).emit('typing', { userId: socket.user.id, name: socket.user.email });
+    });
+
+    socket.on('stop_typing', ({ ticketId }) => {
+      socket.to(`ticket:${ticketId}`).emit('stop_typing', { userId: socket.user.id });
+    });
+
     socket.on('disconnect', () => {
       console.log(`🔌  Socket disconnected: ${socket.id}`);
+      onlineUsers.delete(socket.id);
+      io.emit('presence', Array.from(onlineUsers.values()));
     });
   });
 
@@ -73,8 +92,7 @@ function initSocket(server) {
 }
 
 function getIO() {
-  if (!io) throw new Error('Socket.io not initialized');
-  return io;
+  return io || null;
 }
 
 module.exports = { initSocket, getIO };

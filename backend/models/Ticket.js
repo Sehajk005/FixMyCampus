@@ -1,6 +1,5 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
-const { User } = require('./User');
 
 const Ticket = sequelize.define('Ticket', {
   id:           { type: DataTypes.CHAR(36), primaryKey: true, defaultValue: DataTypes.UUIDV4 },
@@ -12,13 +11,10 @@ const Ticket = sequelize.define('Ticket', {
   priority:     { type: DataTypes.ENUM('low','medium','high','critical'), defaultValue: 'medium' },
   submitter_id: { type: DataTypes.CHAR(36), allowNull: false },
   assigned_to:  { type: DataTypes.CHAR(36), allowNull: true },
+  photo_url:    { type: DataTypes.STRING(255), allowNull: true },
+  is_anonymous: { type: DataTypes.BOOLEAN, defaultValue: false },
 }, {
   tableName: 'tickets',
   underscored: true,
 });
-
-User.hasMany(Ticket,  { foreignKey: 'submitter_id', as: 'submittedTickets' });
-Ticket.belongsTo(User, { foreignKey: 'submitter_id', as: 'submitter' });
-Ticket.belongsTo(User, { foreignKey: 'assigned_to',  as: 'assignee' });
-
 module.exports = { Ticket };

@@ -13,9 +13,6 @@ const app = require('../app');
 const { sequelize } = require('../config/database');
 const { User } = require('../models/User');
 const { OtpToken } = require('../models/OtpToken');
-const { Ticket } = require('../models/Ticket');
-const { Message } = require('../models/Message');
-const { RefreshToken } = require('../models/RefreshToken');
 
 let accessToken;
 let testUserId;

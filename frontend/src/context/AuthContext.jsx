@@ -3,42 +3,72 @@ import api from '../services/api';
 
 const AuthContext = createContext(null);
 
-const SESSION_KEY = 'fmc_session';
-
 export function AuthProvider({ children }) {
-  // Initialise from sessionStorage so refresh doesn't log the user out
-  const [user,  setUser]  = useState(() => {
-    try { return JSON.parse(sessionStorage.getItem(SESSION_KEY))?.user || null; } catch { return null; }
-  });
-  const [token, setToken] = useState(() => {
-    try { return sessionStorage.getItem('fmc_token') || null; } catch { return null; }
-  });
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+  const [isInitializing, setIsInitializing] = useState(true);
 
-  // Re-attach axios header on mount if token already exists
-  useEffect(() => {
-    if (token) {
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  const setTokenAndHeaders = useCallback((newToken) => {
+    setToken(newToken);
+    if (newToken) {
+      api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+    } else {
+      delete api.defaults.headers.common['Authorization'];
     }
   }, []);
 
-  const login = useCallback((userData, accessToken, refreshToken) => {
+  const login = useCallback((userData, accessToken) => {
     setUser(userData);
-    setToken(accessToken);
-    api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-    // Persist to sessionStorage (cleared when browser tab closes — safer than localStorage)
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify({ user: userData }));
-    sessionStorage.setItem('fmc_token', accessToken);
-    sessionStorage.setItem('fmc_refresh', refreshToken);
-  }, []);
+    setTokenAndHeaders(accessToken);
+  }, [setTokenAndHeaders]);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    try {
+      await api.post('/auth/logout');
+    } catch (err) {
+      // Ignore if logout request fails locally
+    }
     setUser(null);
-    setToken(null);
-    delete api.defaults.headers.common['Authorization'];
-    sessionStorage.removeItem(SESSION_KEY);
-    sessionStorage.removeItem('fmc_token');
-    sessionStorage.removeItem('fmc_refresh');
-  }, []);
+    setTokenAndHeaders(null);
+  }, [setTokenAndHeaders]);
+
+  // Attempt silent refresh on mount
+  useEffect(() => {
+    const initAuth = async () => {
+      try {
+        const { data } = await api.post('/auth/refresh-token');
+        setTokenAndHeaders(data.accessToken);
+        const userRes = await api.get('/auth/me'); // Fetch current user details with new token
+        setUser(userRes.data);
+      } catch (err) {
+        console.log('No valid session found during initialization');
+      } finally {
+        setIsInitializing(false);
+      }
+    };
+    initAuth();
+  }, [setTokenAndHeaders]);
+
+  // Handle token refreshes from the API interceptor
+  useEffect(() => {
+    const handleTokenRefreshed = (e) => setTokenAndHeaders(e.detail);
+    const handleTokenFailed = () => {
+      setUser(null);
+      setTokenAndHeaders(null);
+    };
+
+    window.addEventListener('tokenRefreshed', handleTokenRefreshed);
+    window.addEventListener('refreshTokenFailed', handleTokenFailed);
+
+    return () => {
+      window.removeEventListener('tokenRefreshed', handleTokenRefreshed);
+      window.removeEventListener('refreshTokenFailed', handleTokenFailed);
+    };
+  }, [setTokenAndHeaders]);
+
+  if (isInitializing) {
+    return <div className="flex h-screen items-center justify-center">Loading session...</div>;
+  }
 
   return (
     <AuthContext.Provider value={{ user, token, login, logout, isAuthenticated: !!user }}>

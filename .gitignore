@@ -5,3 +5,7 @@ build/
 *.log
 .DS_Store
 coverage/
+firebase/
+backend/firebase/*.json
+frontend/test_firebase_client.js
+tmp_generate_migrations.js
