@@ -1,6 +1,6 @@
 # 🏫 Fix My Campus
 
-[![CI](https://github.com/Sehajk005/FixMyCampus/actions/workflows/ci.yml/badge.svg)](https://github.com/Sehajk005/FixMyCampus/actions/workflows/ci.yml)
+[![CI](https://github.com/Sehajk005/FixMyCampus/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Sehajk005/FixMyCampus/actions/workflows/ci.yml)
 
 > **Campus Complaint Management System** — Chitkara University · Full-Stack Engineering Project (All Phases Complete)
 >
